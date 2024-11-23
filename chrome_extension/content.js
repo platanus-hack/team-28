@@ -1,23 +1,16 @@
-async function getPageContent() {
-  // Get text content from the body
-  const bodyText = document.body.innerText;
+async function getEmailContent() {
+  // Get text content from the email body
+  const emailBody = document.querySelector('[role="main"]')?.innerText || '';
+  // Get email subject (usually in h2)
+  const subject = document.querySelector('[data-thread-pane-title="true"]')?.innerText || '';
+  // Get sender information
+  const sender = document.querySelector('[email]')?.innerText || '';
 
-  // Get all headings
-  const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(
-    (h) => `${h.tagName}: ${h.innerText}`
-  );
-
-  // Get meta description if available
-  const metaDescription = document.querySelector('meta[name="description"]')?.content || 'No meta description';
-
-  // Get title
-  const pageTitle = document.title;
-
-  const pageContent = {
-    title: pageTitle,
-    metaDescription: metaDescription,
-    headings: headings,
-    bodyText: bodyText,
+  const emailContent = {
+    title: subject,
+    metaDescription: `Email from ${sender}`,
+    headings: [], // Gmail emails typically don't have meaningful headings
+    bodyText: emailBody,
   };
 
   try {
@@ -26,7 +19,7 @@ async function getPageContent() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: pageContent }),
+      body: JSON.stringify({ data: emailContent }),
     });
 
     if (!response.ok) {
@@ -34,8 +27,7 @@ async function getPageContent() {
     }
 
     const jsonResponse = await response.json();
-
-    console.log(jsonResponse);
+    console.log('API Response:', jsonResponse);
 
     if (!jsonResponse.isSafe) {
       const alertMessage =
@@ -55,29 +47,44 @@ async function getPageContent() {
   } catch (error) {
     console.error('Error sending data to API:', error);
   }
-
-  console.log('Page Content:', pageContent);
 }
 
-// We need to wrap the initial call in an async IIFE (Immediately Invoked Function Expression)
-(async () => {
-  try {
-    await getPageContent();
-  } catch (error) {
-    console.error('Error in initial page content fetch:', error);
-  }
-})();
+// Function to check if URL is a Gmail email
+function isGmailEmail(url) {
+  // Match pattern: https://mail.google.com/mail/u/0/#.../...
+  return /https:\/\/mail\.google\.com\/mail\/u\/\d+\/#[^/]+\/[^/]+/.test(url);
+}
 
-// MutationObserver with async handling
+// Keep track of the last processed email ID to avoid duplicate processing
+let lastProcessedEmail = '';
+
+// Function to extract email ID from URL
+function getEmailId(url) {
+  const match = url.match(/#[^/]+\/([^/]+)$/);
+  return match ? match[1] : null;
+}
+
+// Watch for URL changes
+function checkForEmailOpen() {
+  const currentUrl = window.location.href;
+  const emailId = getEmailId(currentUrl);
+
+  if (isGmailEmail(currentUrl) && emailId && emailId !== lastProcessedEmail) {
+    lastProcessedEmail = emailId;
+    // Wait a short moment for the email content to load
+    setTimeout(getEmailContent, 1000);
+  }
+}
+
+// Set up URL change detection
 let lastUrl = location.href;
-new MutationObserver(async () => {
-  const url = location.href;
-  if (url !== lastUrl) {
-    lastUrl = url;
-    try {
-      await getPageContent();
-    } catch (error) {
-      console.error('Error in observer page content fetch:', error);
-    }
+new MutationObserver(() => {
+  const currentUrl = location.href;
+  if (currentUrl !== lastUrl) {
+    lastUrl = currentUrl;
+    checkForEmailOpen();
   }
 }).observe(document, { subtree: true, childList: true });
+
+// Initial check
+checkForEmailOpen();
