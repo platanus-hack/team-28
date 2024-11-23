@@ -187,7 +187,7 @@ async function getEmailContent() {
       })),
     };
     console.log('before fetch');
-    const response = await fetch('http://127.0.0.1:3000/api/evaluate-message', {
+    const response = await fetch('https://faro-oio4.onrender.com/api/evaluate-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
