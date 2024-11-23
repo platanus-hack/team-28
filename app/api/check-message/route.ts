@@ -61,14 +61,25 @@ export async function POST(request: Request) {
       max_tokens: 500,
     });
 
-    const result = JSON.parse(completion.choices[0].message.content);
+    const content = completion.choices[0].message.content;
+    
+    if (!content) {
+      throw new Error('No response content from OpenAI');
+    }
+
+    const result = JSON.parse(content) as {
+      isSafe: boolean;
+      explanation: string;
+      safetyTips: string[];
+      recommendedActions: string[];
+    };
     
     // Transform empty values to null for frontend
     const transformedResult = {
       isSafe: result.isSafe,
       explanation: result.explanation || null,
-      safetyTips: result.safetyTips?.some(tip => tip.trim()) ? result.safetyTips : null,
-      recommendedActions: result.recommendedActions?.some(action => action.trim()) ? result.recommendedActions : null,
+      safetyTips: result.safetyTips?.some((tip: string) => tip.trim()) ? result.safetyTips : null,
+      recommendedActions: result.recommendedActions?.some((action: string) => action.trim()) ? result.recommendedActions : null,
     };
 
     return NextResponse.json(transformedResult);
