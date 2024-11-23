@@ -6,17 +6,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react'
 import { MessageCheckResult, MessageCheckError } from '@/components/types'
+import { WarningMessage } from '@/components/warning-message'
 
 export function MessageChecker() {
   const [message, setMessage] = useState('')
   const [result, setResult] = useState<MessageCheckResult>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<MessageCheckError | null>(null)
+  const [isChecking, setIsChecking] = useState(false)
 
   const checkMessage = async () => {
-    if (!message.trim()) return
-
-    setIsLoading(true)
+    setIsChecking(true)
     setError(null)
     setResult(null)
 
@@ -24,91 +23,63 @@ export function MessageChecker() {
       const response = await fetch('/api/check-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message })
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al procesar la solicitud')
+        setError(data.error)
+        return
       }
 
-      setResult(data.isSafe ? 'safe' : 'unsafe')
+      setResult(data)
     } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : 'Error desconocido',
-        code: 'CHECK_ERROR'
-      })
+      setError({ message: 'Failed to check message', code: 'CHECK_FAILED' })
     } finally {
-      setIsLoading(false)
+      setIsChecking(false)
     }
   }
 
-  const renderResult = () => {
-    if (isLoading) return null
-    if (!result) return null
-
-    const isMessageSafe = result === 'safe'
-    const Icon = isMessageSafe ? CheckCircle : XCircle
-    const message = isMessageSafe 
-      ? 'Este mensaje parece ser seguro.'
-      : 'Este mensaje puede ser potencialmente malicioso.'
-
-    return (
-      <div className={`flex items-center ${
-        isMessageSafe ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
-      }`}>
-        <Icon className="mr-2" />
-        <span>{message}</span>
-      </div>
-    )
-  }
-
-  const renderError = () => {
-    if (!error) return null
-
-    return (
-      <div className="flex items-center text-red-500 dark:text-red-400">
-        <AlertCircle className="mr-2" />
-        <span>{error.message}</span>
-      </div>
-    )
-  }
-
   return (
-    <Card className="w-full max-w-3xl">
+    <Card className="w-full max-w-2xl">
       <CardHeader>
-        `<CardTitle>Verificador de Mensajes</CardTitle>`
+        <CardTitle>Verificador de Mensajes</CardTitle>
         <CardDescription>
-          Pega tu mensaje para verificar si es seguro o potencialmente malicioso
+          Pega el mensaje que quieres verificar y analizaremos su seguridad
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <Textarea
-          placeholder="Pega tu mensaje aquí..."
+          placeholder="Pega aquí el mensaje..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="min-h-[100px]"
-          disabled={isLoading}
         />
+        {result && !result.isSafe && result.explanation && (
+          <WarningMessage result={result} />
+        )}
+        {result?.isSafe && (
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <CheckCircle />
+            <span>El mensaje parece seguro</span>
+          </div>
+        )}
+        {error && (
+          <div className="flex items-center gap-2 text-red-500">
+            <AlertCircle />
+            <span>{error.message}</span>
+          </div>
+        )}
       </CardContent>
-      <CardFooter className="flex flex-col items-center gap-4">
+      <CardFooter>
         <Button 
           onClick={checkMessage} 
-          className="w-full" 
-          disabled={isLoading || !message.trim()}
+          disabled={isChecking || !message.trim()}
+          className="w-full"
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Verificando...
-            </>
-          ) : (
-            'Verificar Mensaje'
-          )}
+          {isChecking && <Loader2 className="animate-spin" />}
+          {isChecking ? 'Verificando...' : 'Verificar Mensaje'}
         </Button>
-        {renderResult()}
-        {renderError()}
       </CardFooter>
     </Card>
   )
