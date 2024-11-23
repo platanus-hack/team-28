@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        width: 400px;
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+
+      .analyze-button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 15px;
+      }
+
+      .analyze-button:hover {
+        background-color: #45a049;
+      }
+
+      .results {
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .info-section {
+        background-color: #f5f5f5;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+
+      .info-section h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .link-item {
+        margin: 5px 0;
+        padding: 5px;
+        background: white;
+        border-radius: 3px;
+      }
+
+      .link-url {
+        color: #666;
+        font-size: 0.9em;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="analyzeButton" class="analyze-button">Analyze DOM</button>
+    <div id="results" class="results"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>

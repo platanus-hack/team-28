@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "DOM Reader",
+  "version": "1.0",
+  "description": "Reads DOM elements when extension icon is clicked",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
