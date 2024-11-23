@@ -33,7 +33,6 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - React 18+
 - Tailwind CSS para estilos
 - ShadcnUI para componentes
-- Favicon emoji 🗼 usando data URL SVG
 
 ### Backend y Servicios
 - API de OpenAI (ChatGPT) para análisis de mensajes
@@ -51,7 +50,6 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - Interfaz intuitiva pensada para adultos mayores
 - Textos claros y legibles
 - Botones y elementos interactivos de buen tamaño
-- Favicon consistente con la marca usando el emoji 🗼
 
 ### Experiencia de Usuario
 - Flujo simple
