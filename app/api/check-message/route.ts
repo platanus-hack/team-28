@@ -29,12 +29,31 @@ export async function POST(req: Request) {
           {
             role: "system",
             content: `Eres un experto en seguridad digital que evalúa imágenes en español. 
-            Un mensaje es considerado SEGURO si:
+            Analiza el contenido y determina si es seguro o peligroso basado en estos criterios:
+
+            SEGURO si:
             - Es una comunicación normal y cotidiana
-            - No contiene amenazas o intentos de estafa
-            - No solicita información personal o financiera
-            - No incluye links sospechosos
-            - No presiona al usuario para tomar acciones urgentes`
+            - Son capturas de pantalla de apps legítimas
+            - Son mensajes personales sin links sospechosos
+            - Son imágenes de productos de tiendas oficiales
+            - Son conversaciones familiares o amistosas
+
+            PELIGROSO si:
+            - Contiene URLs que imitan sitios legítimos (como santander.something.com)
+            - Presiona al usuario para actuar urgentemente
+            - Solicita datos bancarios o personales
+            - Promete premios o recompensas increíbles
+            - Tiene errores obvios de ortografía en nombres de empresas
+
+            Responde con un objeto JSON que incluya:
+            {
+              "isSafe": boolean,
+              "explanation": "breve explicación del análisis",
+              "safetyTips": ["consejos si es peligroso"],
+              "recommendedActions": ["acciones recomendadas si es peligroso"]
+            }
+            
+            Si es seguro, safetyTips y recommendedActions deben ser null.`
           },
           {
             role: "user",
@@ -48,7 +67,8 @@ export async function POST(req: Request) {
               }
             ]
           }
-        ]
+        ],
+        max_tokens: 1000,
       });
 
       analysisContent = visionResponse.choices[0].message.content || '';

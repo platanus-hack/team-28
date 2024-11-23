@@ -22,11 +22,23 @@ export function MessageChecker() {
     setSelectedFile(file)
     const imageUrl = URL.createObjectURL(file)
     setSelectedImage(imageUrl)
+    setResult(null)
+    setError(null)
   }
 
   const clearImage = () => {
     setSelectedImage(null)
     setSelectedFile(null)
+    setResult(null)
+    setError(null)
+  }
+
+  const handleTabChange = () => {
+    setMessage('')
+    setSelectedImage(null)
+    setSelectedFile(null)
+    setResult(null)
+    setError(null)
   }
 
   const checkContent = async () => {
@@ -72,7 +84,7 @@ export function MessageChecker() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Tabs defaultValue="text">
+        <Tabs defaultValue="text" className="w-full max-w-2xl" onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="text">Texto</TabsTrigger>
             <TabsTrigger value="image">Imagen</TabsTrigger>
