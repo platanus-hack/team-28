@@ -36,7 +36,6 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 
 ### Backend y Servicios
 - API de OpenAI (ChatGPT) para análisis de mensajes
-- Supabase para database
 - API Routes de Next.js
 
 ### Optimización
@@ -76,7 +75,7 @@ npm run dev
 ## Estructura del Proyecto
 
 ```
-├── .env.example          # Variables de entorno (OpenAI API, Supabase)
+├── .env.example          # Variables de entorno (OpenAI API)
 ├── app/
 │   ├── api/
 │   │   └── check-message/

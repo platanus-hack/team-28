@@ -1,23 +1,63 @@
-import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI();
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { message } = await request.json();
+    const formData = await req.formData();
+    const message = formData.get('message') as string | null;
+    const image = formData.get('image') as Blob | null;
 
-    // Ensure message is a string
-    const sanitizedMessage = (message?.trim() || '').toString();
-
-    if (!sanitizedMessage) {
+    if (!image && !message) {
       return NextResponse.json(
-        { error: { message: 'Message is required', code: 'MISSING_MESSAGE' } },
+        { error: { message: 'Se requiere una imagen o mensaje', code: 'NO_CONTENT' } },
         { status: 400 }
       );
     }
+
+    let analysisContent = '';
+
+    // If there's an image, analyze it with Vision
+    if (image) {
+      const bytes = await image.arrayBuffer();
+      const base64Image = Buffer.from(bytes).toString('base64');
+
+      const visionResponse = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `Eres un experto en seguridad digital que evalúa imágenes en español. 
+            Un mensaje es considerado SEGURO si:
+            - Es una comunicación normal y cotidiana
+            - No contiene amenazas o intentos de estafa
+            - No solicita información personal o financiera
+            - No incluye links sospechosos
+            - No presiona al usuario para tomar acciones urgentes`
+          },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "¿Esta imagen muestra señales de fraude?" },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
+            ]
+          }
+        ]
+      });
+
+      analysisContent = visionResponse.choices[0].message.content || '';
+    }
+
+    // Add text message analysis if present
+    const finalContent = message 
+      ? `${analysisContent}\n\nMensaje de texto: ${message}` 
+      : analysisContent;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -44,7 +84,7 @@ export async function POST(request: Request) {
           - safetyTips: ["", ""]
           - recommendedActions: ["", ""]
           
-          Responde en formato JSON con la siguiente estructura:
+          DEBES RESPONDER EN JSON con esta estructura exacta:
           {
             "isSafe": boolean,
             "explanation": string,
@@ -54,40 +94,19 @@ export async function POST(request: Request) {
         },
         {
           role: "user",
-          content: `Evalúa la seguridad del siguiente mensaje: "${sanitizedMessage}"`
+          content: `Evalúa la seguridad del siguiente mensaje y responde en JSON: "${finalContent}"`
         }
       ],
       response_format: { type: "json_object" },
       max_tokens: 500,
     });
 
-    const content = completion.choices[0].message.content;
-    
-    if (!content) {
-      throw new Error('No response content from OpenAI');
-    }
-
-    const result = JSON.parse(content) as {
-      isSafe: boolean;
-      explanation: string;
-      safetyTips: string[];
-      recommendedActions: string[];
-    };
-    
-    // Transform empty values to null for frontend
-    const transformedResult = {
-      isSafe: result.isSafe,
-      explanation: result.explanation || null,
-      safetyTips: result.safetyTips?.some((tip: string) => tip.trim()) ? result.safetyTips : null,
-      recommendedActions: result.recommendedActions?.some((action: string) => action.trim()) ? result.recommendedActions : null,
-    };
-
-    return NextResponse.json(transformedResult);
+    return NextResponse.json(JSON.parse(completion.choices[0].message.content || '{}'));
 
   } catch (error) {
-    console.error('Error checking message:', error);
+    console.error('Error:', error);
     return NextResponse.json(
-      { error: { message: 'Failed to check message', code: 'CHECK_FAILED' } },
+      { error: { message: 'Error al verificar el contenido', code: 'CHECK_FAILED' } },
       { status: 500 }
     );
   }
