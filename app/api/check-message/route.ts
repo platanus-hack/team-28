@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    console.log('API Key:', process.env.OPENAI_API_KEY); // Temporary log for debugging
+    console.log('API Key:', process.env.OPENAI_API_KEY);
 
     const { message } = await req.json();
 
@@ -38,7 +38,12 @@ export async function POST(req: Request) {
     console.error('Error al verificar el mensaje:', error);
     // Log the full error object
     console.error('Full error:', JSON.stringify(error, null, 2));
-    return NextResponse.json({ error: 'Error al procesar la solicitud', details: error.message }, { status: 500 });
+    
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    return NextResponse.json(
+      { error: 'Error al procesar la solicitud', details: errorMessage },
+      { status: 500 }
+    );
   }
 }
 
