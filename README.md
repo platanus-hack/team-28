@@ -33,10 +33,10 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - React 18+
 - Tailwind CSS para estilos
 - ShadcnUI para componentes
+- Favicon emoji 🗼 usando data URL SVG
 
 ### Backend y Servicios
 - API de OpenAI (ChatGPT) para análisis de mensajes
-- Supabase para database
 - API Routes de Next.js
 
 ### Optimización
@@ -51,6 +51,7 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - Interfaz intuitiva pensada para adultos mayores
 - Textos claros y legibles
 - Botones y elementos interactivos de buen tamaño
+- Favicon consistente con la marca usando el emoji 🗼
 
 ### Experiencia de Usuario
 - Flujo simple
@@ -76,14 +77,13 @@ npm run dev
 ## Estructura del Proyecto
 
 ```
-├── .env.example          # Variables de entorno (OpenAI API, Supabase)
+├── .env.example          # Variables de entorno (OpenAI API)
 ├── app/
 │   ├── api/
 │   │   └── check-message/
 │   │       └── route.ts  # Endpoint para verificación de mensajes
-│   ├── favicon.ico
+│   ├── layout.tsx        # Layout principal y configuración de favicon
 │   ├── globals.css       # Estilos globales y variables CSS
-│   ├── layout.tsx        # Layout principal de la aplicación
 │   └── page.tsx          # Página principal
 ├── components/
 │   ├── message-checker.tsx    # Componente de verificación de mensajes
