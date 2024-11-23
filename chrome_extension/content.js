@@ -72,6 +72,65 @@ function disableAllUrls(emailBodyElement, links) {
   });
 }
 
+function enableAllUrls(emailBodyElement, links) {
+  if (!emailBodyElement) return;
+
+  // Re-enable anchor tags
+  links.forEach((link) => {
+    if (link.type === 'anchor' && link.element) {
+      const element = link.element;
+
+      // Restore original href if it was stored
+      if (element.dataset.originalHref) {
+        element.href = element.dataset.originalHref;
+        delete element.dataset.originalHref;
+      }
+
+      // Remove disabled styles
+      element.removeAttribute('style');
+
+      // Remove warning tooltip
+      element.removeAttribute('title');
+
+      // Remove warning icon if present
+      const warningSpan = Array.from(element.childNodes).find(
+        (node) => node.nodeType === Node.TEXT_NODE && node.textContent.includes('⚠️')
+      );
+      if (warningSpan) {
+        element.removeChild(warningSpan);
+      }
+
+      // Remove click event listener
+      element.removeEventListener(
+        'click',
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        true
+      );
+    }
+  });
+
+  // Re-enable plain text URLs
+  const spanElements = emailBodyElement.querySelectorAll('span');
+  spanElements.forEach((span) => {
+    // Check if this span was created by the disable function
+    if (span.title === '⚠️ URL disabled due to security concerns') {
+      const urlText = span.textContent.replace(' ⚠️', '');
+      const textNode = document.createTextNode(urlText);
+      span.parentNode.replaceChild(textNode, span);
+    }
+
+    // Handle nested spans created for URLs within text
+    if (span.innerHTML.includes('⚠️ URL disabled due to security concerns')) {
+      const originalText = span.innerHTML.replace(/<span[^>]*>(.*?) ⚠️<\/span>/g, '$1');
+      span.innerHTML = originalText;
+    }
+  });
+}
+
+const links = [];
 async function getEmailContent() {
   try {
     // Get DOM elements
@@ -86,7 +145,6 @@ async function getEmailContent() {
     const emailBody = emailBodyElement.innerText || '';
 
     // Extract all URLs and links
-    const links = [];
 
     // Get all <a> tags
     const anchorTags = emailBodyElement.getElementsByTagName('a');
@@ -128,7 +186,7 @@ async function getEmailContent() {
         type: link.type,
       })),
     };
-
+    console.log('before fetch');
     const response = await fetch('http://127.0.0.1:3000/api/evaluate-message', {
       method: 'POST',
       headers: {
@@ -142,28 +200,51 @@ async function getEmailContent() {
     }
 
     const jsonResponse = await response.json();
+    console.log(jsonResponse);
 
     if (!jsonResponse.isSafe) {
+      // Disable all URLs first
+      alert('Estafa potencial detectada. Haga clic en la extensión para obtener más información.');
       disableAllUrls(emailBodyElement, links);
 
-      const alertMessage =
-        `⚠️ ADVERTENCIA DE SEGURIDAD ⚠️\n\n` +
-        `${jsonResponse.explanation}\n\n` +
-        `Consejos de Seguridad:\n` +
-        `• ${jsonResponse.safetyTips[0]}\n` +
-        `• ${jsonResponse.safetyTips[1]}\n\n` +
-        `Acciones Recomendadas:\n` +
-        `• ${jsonResponse.recommendedActions[0]}\n` +
-        `• ${jsonResponse.recommendedActions[1]}\n\n` +
-        `Todos los enlaces han sido desactivados por su seguridad.`;
+      // Store the security warning data
+      await chrome.storage.local.set({
+        securityWarning: {
+          explanation: jsonResponse.explanation,
+          safetyTips: jsonResponse.safetyTips,
+          recommendedActions: jsonResponse.recommendedActions,
+        },
+      });
 
-      alert(alertMessage);
+      // Open the popup by updating the extension's badge
+      chrome.runtime.sendMessage({
+        type: 'SECURITY_WARNING',
+        data: {
+          tabId: chrome.runtime.id,
+        },
+      });
     }
   } catch (error) {
     console.error('Error:', error);
   }
 }
 
+// Message listeners for communication with popup and background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // Handle enable links request from popup
+  if (request.action === 'enableLinks') {
+    const emailBodyElement = document.querySelector('[role="main"]');
+    if (emailBodyElement) {
+      enableAllUrls(emailBodyElement, links);
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: 'Email body element not found' });
+    }
+    return true;
+  }
+});
+
+// The rest of your existing URL checking and monitoring code remains the same
 function isGmailEmail(url) {
   return /https:\/\/mail\.google\.com\/mail\/u\/\d+\/#[^/]+\/[^/]+/.test(url);
 }
@@ -178,10 +259,11 @@ function getEmailId(url) {
 function checkForEmailOpen() {
   const currentUrl = window.location.href;
   const emailId = getEmailId(currentUrl);
-
+  console.log(currentUrl);
   if (isGmailEmail(currentUrl) && emailId && emailId !== lastProcessedEmail) {
     lastProcessedEmail = emailId;
-    setTimeout(getEmailContent, 1000);
+    getEmailContent();
+    // setTimeout(getEmailContent, 1000);
   }
 }
 

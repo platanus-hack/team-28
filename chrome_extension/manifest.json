@@ -1,15 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "Page Content Reader",
+  "name": "Email Security Scanner",
   "version": "1.0",
-  "description": "Reads and logs webpage content to console",
-  "permissions": ["activeTab", "scripting"],
+  "description": "Scans emails for security threats and manages link safety",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://mail.google.com/*"],
       "js": ["content.js"]
     }
   ]
