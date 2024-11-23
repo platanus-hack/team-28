@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react'
-import { MessageCheckResult, MessageCheckError } from './types'
+import { MessageCheckResult, MessageCheckError } from '@/components/types'
 
 export function MessageChecker() {
   const [message, setMessage] = useState('')
@@ -78,7 +78,7 @@ export function MessageChecker() {
   return (
     <Card className="w-full max-w-3xl">
       <CardHeader>
-        <CardTitle>Verificador de Seguridad de Mensajes</CardTitle>
+        `<CardTitle>Verificador de Mensajes</CardTitle>`
         <CardDescription>
           Pega tu mensaje para verificar si es seguro o potencialmente malicioso
         </CardDescription>
