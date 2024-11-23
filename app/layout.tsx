@@ -7,7 +7,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FARO - Verificador de Seguridad de Mensajes',
+  title: 'FARO 🗼',
   description: 'Identifica rápidamente si los mensajes son seguros o potencialmente malicioso',
 }
 
