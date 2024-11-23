@@ -1,20 +1,20 @@
 {
   "name": "FARO",
   "short_name": "FARO",
-  "display": "standalone",
+  "description": "Verifica la seguridad de tus mensajes",
   "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "share_target": {
-    "action": "/",
+    "action": "/share",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url",
       "files": [
         {
           "name": "image",
-          "accept": ["image/*"]
+          "accept": ["image/png", "image/jpeg", "image/jpg"]
         }
       ]
     }
@@ -23,12 +23,14 @@
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

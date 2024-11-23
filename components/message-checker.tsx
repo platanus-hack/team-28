@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,13 +10,23 @@ import { WarningMessage } from '@/components/warning-message'
 import { ImageUpload } from '@/components/image-upload'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export function MessageChecker() {
+interface MessageCheckerProps {
+  initialShared?: boolean;
+}
+
+export function MessageChecker({ initialShared = false }: MessageCheckerProps) {
   const [message, setMessage] = useState('')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [result, setResult] = useState<MessageCheckResult>(null)
   const [error, setError] = useState<MessageCheckError | null>(null)
   const [isChecking, setIsChecking] = useState(false)
+
+  useEffect(() => {
+    if (initialShared) {
+      console.log('Content was shared with the app')
+    }
+  }, [initialShared])
 
   const handleImageSelect = (file: File) => {
     setSelectedFile(file)
