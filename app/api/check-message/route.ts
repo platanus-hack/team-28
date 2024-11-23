@@ -3,6 +3,33 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI();
 
+const SECURITY_SYSTEM_MESSAGE = `Eres un experto en seguridad digital que evalúa mensajes en español. 
+Analiza el contenido y determina si es seguro o peligroso basado en estos criterios:
+
+SEGURO si:
+- Es una comunicación normal y cotidiana
+- Son capturas de pantalla de apps legítimas
+- Son mensajes personales sin links sospechosos
+- Son imágenes de productos de tiendas oficiales
+- Son conversaciones familiares o amistosas
+
+PELIGROSO si:
+- Contiene URLs que imitan sitios legítimos (como santander.something.com)
+- Presiona al usuario para actuar urgentemente
+- Solicita datos bancarios o personales
+- Promete premios o recompensas increíbles
+- Tiene errores obvios de ortografía en nombres de empresas
+
+Responde con un objeto JSON que incluya:
+{
+  "isSafe": boolean,
+  "explanation": "breve explicación del análisis",
+  "safetyTips": ["consejos si es peligroso"],
+  "recommendedActions": ["acciones recomendadas si es peligroso"]
+}
+
+Si es seguro, explanation debe estar vacío y safetyTips y recommendedActions deben ser arrays vacíos.`;
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
@@ -28,32 +55,7 @@ export async function POST(req: Request) {
         messages: [
           {
             role: "system",
-            content: `Eres un experto en seguridad digital que evalúa imágenes en español. 
-            Analiza el contenido y determina si es seguro o peligroso basado en estos criterios:
-
-            SEGURO si:
-            - Es una comunicación normal y cotidiana
-            - Son capturas de pantalla de apps legítimas
-            - Son mensajes personales sin links sospechosos
-            - Son imágenes de productos de tiendas oficiales
-            - Son conversaciones familiares o amistosas
-
-            PELIGROSO si:
-            - Contiene URLs que imitan sitios legítimos (como santander.something.com)
-            - Presiona al usuario para actuar urgentemente
-            - Solicita datos bancarios o personales
-            - Promete premios o recompensas increíbles
-            - Tiene errores obvios de ortografía en nombres de empresas
-
-            Responde con un objeto JSON que incluya:
-            {
-              "isSafe": boolean,
-              "explanation": "breve explicación del análisis",
-              "safetyTips": ["consejos si es peligroso"],
-              "recommendedActions": ["acciones recomendadas si es peligroso"]
-            }
-            
-            Si es seguro, safetyTips y recommendedActions deben ser null.`
+            content: SECURITY_SYSTEM_MESSAGE
           },
           {
             role: "user",
@@ -69,6 +71,7 @@ export async function POST(req: Request) {
           }
         ],
         max_tokens: 1000,
+        temperature: 0,
       });
 
       analysisContent = visionResponse.choices[0].message.content || '';
@@ -84,33 +87,7 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: `Eres un experto en seguridad digital que evalúa mensajes en español. 
-          Tu trabajo es identificar si un mensaje es seguro o potencialmente peligroso.
-
-          Un mensaje es considerado SEGURO si:
-          - Es una comunicación normal y cotidiana
-          - No contiene amenazas o intentos de estafa
-          - No solicita información personal o financiera
-          - No incluye links sospechosos
-          - No presiona al usuario para tomar acciones urgentes
-
-          Solo si detectas un mensaje sospechoso, proporciona:
-          1. Una explicación breve y clara del por qué es peligroso (máximo 2 líneas)
-          2. Exactamente 2 consejos específicos de seguridad
-          3. Exactamente 2 pasos recomendados a seguir
-          
-          Para mensajes seguros, usa estos valores por defecto:
-          - explanation: ""
-          - safetyTips: ["", ""]
-          - recommendedActions: ["", ""]
-          
-          DEBES RESPONDER EN JSON con esta estructura exacta:
-          {
-            "isSafe": boolean,
-            "explanation": string,
-            "safetyTips": string[],
-            "recommendedActions": string[]
-          }`
+          content: SECURITY_SYSTEM_MESSAGE
         },
         {
           role: "user",
@@ -119,6 +96,7 @@ export async function POST(req: Request) {
       ],
       response_format: { type: "json_object" },
       max_tokens: 500,
+      temperature: 0,
     });
 
     return NextResponse.json(JSON.parse(completion.choices[0].message.content || '{}'));
