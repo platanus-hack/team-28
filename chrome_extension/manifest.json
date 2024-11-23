@@ -15,5 +15,11 @@
       "matches": ["*://mail.google.com/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "icons": {
+    "16": "faro-16.png",
+    "32": "faro-32.png",
+    "48": "faro-48.png",
+    "128": "faro-128.png"
+  }
 }
