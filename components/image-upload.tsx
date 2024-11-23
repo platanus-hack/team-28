@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Upload, X, Share2 } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import { Button } from './ui/button'
 import Image from 'next/image'
 
@@ -10,16 +10,26 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ onImageSelect, onClear, selectedImage }: ImageUploadProps) {
-  const [canShare, setCanShare] = useState(false)
-
   useEffect(() => {
-    // Check if Web Share API is supported
-    setCanShare('share' in navigator && 'canShare' in navigator)
-    
+    // Register service worker for share target
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/share-target-sw.js')
+      navigator.serviceWorker
+        .register('/share-target-sw.js')
+        .then(() => {
+          console.log('Service Worker registered for share target')
+        })
+        .catch((err) => {
+          console.error('Service Worker registration failed:', err)
+        })
+
+      // Listen for shared files from the service worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'shared-file' && event.data.file) {
+          onImageSelect(event.data.file)
+        }
+      })
     }
-  }, [])
+  }, [onImageSelect])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -28,52 +38,25 @@ export function ImageUpload({ onImageSelect, onClear, selectedImage }: ImageUplo
     }
   }
 
-  const handleShare = async () => {
-    if ('share' in navigator) {
-      try {
-        await navigator.share({
-          title: 'Compartir con FARO',
-          text: 'Verificar imagen con FARO'
-        })
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error sharing:', error)
-        }
-      }
-    }
-  }
-
   return (
     <div className="space-y-4">
       {!selectedImage ? (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 border-gray-600">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
-                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-semibold">Haz click para subir</span> o arrastra y suelta
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG o JPEG</p>
-              </div>
-              <input 
-                type="file" 
-                className="hidden" 
-                accept="image/png, image/jpeg, image/jpg"
-                onChange={handleFileSelect}
-              />
-            </label>
-          </div>
-          {canShare && (
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={handleShare}
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Compartir desde Fotos
-            </Button>
-          )}
+        <div className="flex items-center justify-center w-full">
+          <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 border-gray-600">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <span className="font-semibold">Haz click para subir</span> o arrastra y suelta
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG o JPEG</p>
+            </div>
+            <input 
+              type="file" 
+              className="hidden" 
+              accept="image/png, image/jpeg, image/jpg"
+              onChange={handleFileSelect}
+            />
+          </label>
         </div>
       ) : (
         <div className="relative">

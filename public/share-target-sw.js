@@ -6,21 +6,31 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
+async function broadcastSharedFile(file) {
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'shared-file',
+      file
+    });
+  });
+}
+
+self.addEventListener('fetch', async (event) => {
   if (event.request.method !== 'POST') return;
   
-  event.respondWith(Response.redirect('/'));
-  
-  event.waitUntil(
-    (async function() {
-      const data = await event.request.formData();
-      const client = await self.clients.get(event.resultingClientId);
-      const file = data.get('file');
-      
-      client.postMessage({
-        file,
-        action: 'load-image'
-      });
-    })()
-  );
+  if (event.request.url.endsWith('/')) {
+    event.respondWith(Response.redirect('/'));
+    
+    event.waitUntil(
+      (async () => {
+        const formData = await event.request.formData();
+        const file = formData.get('image');
+        
+        if (file) {
+          await broadcastSharedFile(file);
+        }
+      })()
+    );
+  }
 });

@@ -1,19 +1,34 @@
 {
   "name": "FARO",
   "short_name": "FARO",
-  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "start_url": "/",
   "share_target": {
-    "action": "/share-target/",
+    "action": "/",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
-      "files": [{
-        "name": "file",
-        "accept": ["image/*"]
-      }]
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "image",
+          "accept": ["image/*"]
+        }
+      ]
     }
-  }
+  },
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

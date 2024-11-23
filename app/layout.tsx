@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'FARO 🗼',
   description: 'Identifica rápidamente si los mensajes son seguros o potencialmente malicioso',
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({
