@@ -10,6 +10,17 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ onImageSelect, onClear, selectedImage }: ImageUploadProps) {
+  const [canShare, setCanShare] = useState(false)
+
+  useEffect(() => {
+    // Check if Web Share API is supported
+    setCanShare('share' in navigator && 'canShare' in navigator)
+    
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/share-target-sw.js')
+    }
+  }, [])
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -17,22 +28,17 @@ export function ImageUpload({ onImageSelect, onClear, selectedImage }: ImageUplo
     }
   }
 
-  useEffect(() => {
-    if (navigator.share) {
-      // Register share target
-      navigator.serviceWorker?.register('/share-target-sw.js')
-    }
-  }, [])
-
   const handleShare = async () => {
-    if (navigator.share) {
+    if ('share' in navigator) {
       try {
         await navigator.share({
           title: 'Compartir con FARO',
           text: 'Verificar imagen con FARO'
         })
       } catch (error) {
-        console.error('Error sharing:', error)
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Error sharing:', error)
+        }
       }
     }
   }
@@ -58,7 +64,7 @@ export function ImageUpload({ onImageSelect, onClear, selectedImage }: ImageUplo
               />
             </label>
           </div>
-          {navigator.share && (
+          {canShare && (
             <Button 
               variant="outline" 
               className="w-full"
