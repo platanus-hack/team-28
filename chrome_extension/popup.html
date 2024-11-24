@@ -29,7 +29,16 @@
       .logo {
         width: 32px;
         height: 32px;
-        cursor: pointer;
+      }
+      .faro {
+        padding: 5px;
+        margin-left: 140px;
+        height: 50px;
+        margin-top: 30px;
+      }
+      .container-thing {
+        display: flex;
+        flex: row;
       }
       .explanation {
         margin-bottom: 16px;
@@ -50,6 +59,7 @@
         display: flex;
         gap: 12px;
         margin-top: 20px;
+        padding: 10px;
       }
       .enable-button {
         padding: 8px 16px;
@@ -87,9 +97,12 @@
     <ul class="tips-list" id="safetyTips"></ul>
     <div class="section-title">Acciones Recomendadas:</div>
     <ul class="tips-list" id="recommendedActions"></ul>
-    <div class="button-container">
-      <button class="enable-button" id="enableLinks">Habilitar Enlaces</button>
-      <button class="close-button" id="closePopup">Cerrar</button>
+    <div class="container-thing">
+      <div class="button-container">
+        <button class="enable-button" id="enableLinks">Habilitar Enlaces</button>
+        <button class="close-button" id="closePopup">Cerrar</button>
+      </div>
+      <img src="faro.png" alt="faro" class="faro" id="faro" />
     </div>
     <script src="securityPopup.js"></script>
   </body>
