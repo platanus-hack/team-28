@@ -11,6 +11,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       tabId: sender.tab.id,
     });
 
+    chrome.action.setPopup({
+      tabId: sender.tab.id,
+      popup: 'popup.html',
+    });
+
     // The popup will be shown when the user clicks the extension icon
     sendResponse({ success: true });
     return true;
@@ -18,9 +23,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Clear the badge when the popup is opened
-chrome.action.onClicked.addListener((tab) => {
-  chrome.action.setBadgeText({
-    text: '',
-    tabId: tab.id,
-  });
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    chrome.action.setBadgeText({
+      text: '',
+      tabId: tabId,
+    });
+
+    // Reset the popup
+    chrome.action.setPopup({
+      tabId: tabId,
+      popup: '',
+    });
+  }
 });
