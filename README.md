@@ -16,6 +16,13 @@ FARO es una aplicación web diseñada para ayudar a las personas en Chile (y pr�
 ## ¿Por qué FARO?
 En la era digital actual, las estafas a través de mensajes fraudulentos son cada vez más comunes, especialmente dirigidas a adultos mayores. FARO actúa como un faro de seguridad, iluminando el camino para identificar mensajes potencialmente peligrosos de manera simple y clara.
 
+| Region       | Perdidas por Phishing (2023) |
+|--------------|---------------------------------------|
+| World    | $40 billion                          |
+| United States | $16 billion                      |
+| Latin America | $1.5 billion                    |
+| Chile    | Approximately $150 million           |
+
 ## Características Principales
 
 ### Verificación de Mensajes
