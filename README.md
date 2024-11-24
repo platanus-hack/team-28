@@ -1,3 +1,13 @@
+I'll help you update the README.md based on the current codebase. The main changes needed are:
+
+1. Update the tech stack to reflect the actual dependencies
+2. Add more details about the image analysis feature
+3. Update the project structure to match reality
+4. Add information about environment variables
+
+Here's the updated README.md:
+
+```markdown:README.md
 # FARO
 
 ## Visión General
@@ -9,10 +19,10 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 ## Características Principales
 
 ### Verificación de Mensajes
-- Análisis de mensajes de múltiples fuentes:
-  - SMS
-  - WhatsApp
-  - Telegram
+- Análisis de contenido de múltiples fuentes:
+  - Mensajes de texto
+  - Capturas de pantalla
+  - Imágenes de conversaciones
   - Correos electrónicos
 
 ### Sistema de Alertas Simple
@@ -25,6 +35,7 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - Detección de errores tipográficos en dominios conocidos
 - Verificación de protocolos de seguridad (HTTPS)
 - Identificación de patrones comunes de estafa
+- Análisis de imágenes con IA
 
 ## Stack Tecnológico
 
@@ -33,28 +44,24 @@ En la era digital actual, las estafas a través de mensajes fraudulentos son cad
 - React 18+
 - Tailwind CSS para estilos
 - ShadcnUI para componentes
+- Radix UI para componentes accesibles
 
 ### Backend y Servicios
-- API de OpenAI (ChatGPT) para análisis de mensajes
 - API Routes de Next.js
+- OpenAI GPT-4 Vision para análisis de imágenes
+- OpenAI GPT-4 para análisis de texto
 
 ### Optimización
 - Diseño responsivo para todos los dispositivos
-- Optimización de rendimiento y tiempos de carga
+- Optimización de imágenes con Next.js Image
+- Lazy loading de componentes
+- Tema claro/oscuro con next-themes
 
-## Principios de Diseño
+## Variables de Entorno
 
-### Interfaz de Usuario
-- Diseño minimalista y limpio
-- Enfoque en la accesibilidad
-- Interfaz intuitiva pensada para adultos mayores
-- Textos claros y legibles
-- Botones y elementos interactivos de buen tamaño
-
-### Experiencia de Usuario
-- Flujo simple
-- Retroalimentación clara e inmediata
-- Mensajes de error comprensibles
+```bash
+OPENAI_API_KEY=tu_api_key_aquí
+```
 
 ## Comenzando
 
@@ -66,7 +73,7 @@ npm install
 
 # Configurar variables de entorno
 cp .env.example .env
-# Editar .env con tus claves API
+# Editar .env con tu clave API de OpenAI
 
 # Iniciar servidor de desarrollo
 npm run dev
@@ -80,21 +87,21 @@ npm run dev
 │   ├── api/
 │   │   └── check-message/
 │   │       └── route.ts  # Endpoint para verificación de mensajes
-│   ├── layout.tsx        # Layout principal y configuración de favicon
+│   ├── layout.tsx        # Layout principal y configuración de tema
 │   ├── globals.css       # Estilos globales y variables CSS
 │   └── page.tsx          # Página principal
 ├── components/
-│   ├── message-checker.tsx    # Componente de verificación de mensajes
-│   ├── mode-toggle.tsx        # Selector de tema claro/oscuro
-│   ├── theme-provider.tsx     # Proveedor de tema
-│   ├── types.ts              # Tipos TypeScript
-│   ├── ui/
-│   │   ├── button.tsx        # Componente de botón
-│   │   ├── card.tsx          # Componente de tarjeta
-│   │   └── textarea.tsx      # Componente de área de texto
-│   └── warning-message.tsx   # Componente de mensajes de advertencia
+│   ├── image-upload.tsx      # Componente de carga de imágenes
+│   ├── message-checker.tsx   # Componente principal de verificación
+│   ├── mode-toggle.tsx       # Selector de tema claro/oscuro
+│   ├── report-button.tsx     # Botón para reportar mensajes
+│   ├── theme-provider.tsx    # Proveedor de tema
+│   ├── types.ts             # Tipos TypeScript
+│   ├── ui/                  # Componentes base
+│   └── warning-message.tsx  # Componente de advertencias
 ├── lib/
-│   └── utils.ts              # Utilidades compartidas
+│   └── utils.ts            # Utilidades compartidas
+└── public/                 # Assets estáticos
 ```
 
 ## Estándares de Código
@@ -119,39 +126,25 @@ npm run dev
 - ✅ Sistema de respuesta Verde/Rojo
 
 ### Fase 2 - Próximamente
-- 🔄 Soporte para mensajes de voz
-  - Transcripción automática de audio
-  - Análisis de contenido de mensajes de voz
-  - Soporte para diferentes acentos latinoamericanos
-- 🔄 Expansión a más países de LATAM
-  - Base de datos de bancos y servicios por país
-  - Patrones de estafa específicos por región
-  - Soporte para variaciones lingüísticas locales
+- Soporte para mensajes de voz con transcripción automática de audio
+- Expansión a más países de LATAM con soporte para variaciones lingüísticas locales
+- Base de datos de bancos y servicios por país
+- Patrones de estafa específicos por región
 
 ### Fase 3 - Futuro
 - 📱 Aplicación móvil nativa
-  - Integración directa con WhatsApp
-  - Acceso rápido desde el menú compartir
-  - Notificaciones en tiempo real
-- 🎯 Características Avanzadas
-  - Base de datos comunitaria de estafas reportadas
-  - Sistema de aprendizaje automático para mejorar la detección
-  - Panel de estadísticas para instituciones y autoridades
-- 🌟 Mejoras de Accesibilidad
-  - Modo de alto contraste
-  - Soporte para lectores de pantalla
-  - Tutoriales interactivos para adultos mayores
-  - Asistente virtual por voz
+- Integración directa con plataformas de email
+- Integración directa con WhatsApp/Telegram
+- Acceso rápido desde el menú compartir
+- Notificaciones en tiempo real
+- Base de datos comunitaria de estafas reportadas
+- Sistema de aprendizaje automático para mejorar la detección
+- Panel de estadísticas para instituciones y autoridades
 
 ### Fase 4 - Visión a Largo Plazo
 - 🤝 Colaboraciones Institucionales
   - Integración con sistemas bancarios
-  - Colaboración con fuerzas de seguridad
   - Alianzas con organizaciones de adultos mayores
-- 🔒 Características de Seguridad Avanzada
-  - Verificación biométrica
-  - Autenticación de dos factores simplificada
-  - Sistema de respaldo de mensajes seguros
 - 🌍 Internacionalización
   - Soporte para múltiples idiomas
   - Adaptación a patrones de estafa globales
@@ -163,17 +156,11 @@ npm run dev
 - Chatbot especializado para resolver dudas sobre seguridad
 - Integración con redes sociales para verificación de perfiles
 - Herramienta de educación financiera básica
-- Sistema de alertas tempranas para nuevos tipos de estafa
-- Comunidad de apoyo entre usuarios
-- Línea directa de asistencia para casos urgentes
 
-## Despliegue
+## Deploy
 
 La aplicación está optimizada para ser desplegada en Vercel:
 
 1. Conecta tu repositorio con Vercel
 2. Configura las variables de entorno
-3. Despliega
-
-## Licencia
-Este proyecto está bajo la licencia MIT. Ver el archivo `LICENSE` para más detalles.
+3. Deploya

@@ -1,3 +1,23 @@
+/**
+ * MessageChecker Component
+ * 
+ * A React component that provides a user interface for checking potentially fraudulent
+ * messages and images. Users can input text messages or upload images to verify
+ * their authenticity and safety.
+ * 
+ * Key Features:
+ * - Text message verification
+ * - Image upload and verification
+ * - Real-time feedback with visual indicators
+ * - Support for shared content from other apps
+ * 
+ * Usage:
+ * <MessageChecker initialShared={boolean} />
+ * 
+ * The component handles all state management internally and makes API calls to
+ * /api/check-message for content verification.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,6 +35,7 @@ interface MessageCheckerProps {
 }
 
 export function MessageChecker({ initialShared = false }: MessageCheckerProps) {
+  // State variables for message, image, file, result, error, and checking status
   const [message, setMessage] = useState('')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -22,12 +43,14 @@ export function MessageChecker({ initialShared = false }: MessageCheckerProps) {
   const [error, setError] = useState<MessageCheckError | null>(null)
   const [isChecking, setIsChecking] = useState(false)
 
+  // Log when content is shared with the app
   useEffect(() => {
     if (initialShared) {
       console.log('Content was shared with the app')
     }
   }, [initialShared])
 
+  // Handle image selection and update state
   const handleImageSelect = (file: File) => {
     setSelectedFile(file)
     const imageUrl = URL.createObjectURL(file)
@@ -36,6 +59,7 @@ export function MessageChecker({ initialShared = false }: MessageCheckerProps) {
     setError(null)
   }
 
+  // Clear image and reset state
   const clearImage = () => {
     setSelectedImage(null)
     setSelectedFile(null)
