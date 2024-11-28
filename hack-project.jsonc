@@ -4,7 +4,7 @@
     // descripción de una frase y directa al grano de la solución
     "oneliner": "Verificador de estafas",
     // url al logo de proyecto. mínimo 200x200, png. puede estar hosteado en el mismo repo.
-    "logo_url": "https://github.com/platanus-hack/team-28/blob/main/logo.png",
+    "logo_url": "https://github.com/platanus-hack/team-28/blob/master/logo.png",
     // url para acceder a su app. si es apk u otro, link de descarga directa.
     "app_url": "https://faro-swart.vercel.app/"
 }
